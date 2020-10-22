@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+    <head th:include="include/admin/adminHeader::html('分类管理')"></head>
+    <body>
+        <div th:replace="include/admin/adminNavigator::html"></div>
+    <script>
+        $(function () {
+            var data4Vue = {
+                //与CategoryController.java呼应
+                uri:'categories',
+                beans:[]
+            };
+
+            //ViewModel
+            var vue = new Vue({
+                el:'#workingArea',
+                data:data4Vue,
+                mounted:function () {//mounted表示这个Vue对象加载成功了,成功后调用list()函数
+                    this.list();
+
+                },
+                methods:{
+                    //使用 data4Vue里的 uri作为地址，然后调用 axios.js 这个 ajax库，进行异步调用。
+                    // 调用成功之后，把服务端返回的数据，保存在 vue.beans 上。
+                    list:function(){
+                        var url =this.url;
+                        axios.get(url).then(function (response) {
+                            vue.beans = response.data;
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+    </body>
+</html>
