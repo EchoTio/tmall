@@ -3,7 +3,7 @@
 	  <ul class="pagination">
 	    <li :class="{ disabled: pagination.first }">
 	      <a  href="#nowhere" @click="jump('first')">«</a>
-	    </li>
+	    </li><!--首页，当首页为1不可点击-->
 	    <li :class="{ disabled: !pagination.hasPrevious }">
 	      <a  href="#nowhere" @click="jump('pre')">‹</a>
 	    </li>		    
