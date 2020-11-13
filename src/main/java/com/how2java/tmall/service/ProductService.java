@@ -2,6 +2,7 @@ package com.how2java.tmall.service;
 
 import com.how2java.tmall.dao.ProductDAO;
 import com.how2java.tmall.pojo.Category;
+import com.how2java.tmall.pojo.OrderItem;
 import com.how2java.tmall.pojo.Product;
 import com.how2java.tmall.util.Page4Navigator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ public class ProductService {
     @Autowired ProductDAO productDAO;
     @Autowired CategoryService categoryService;
     @Autowired ProductImageService productImageService;
+    @Autowired
+    OrderItemService orderItemService;
 
     public void add(Product bean){
         productDAO.save(bean);
@@ -74,4 +77,24 @@ public class ProductService {
     public List<Product> listByCategory(Category category){
         return productDAO.findByCategoryOrderById(category);
     }
+
+    //为产品设置销量和评价数量
+    public void setSaleAndReviewNumber(Product product){
+        int saleCount = orderItemService.getSaleCount(product);
+        product.setSaleCount(saleCount);
+    }
+
+    public void setSaleAndReviewNumber(List<Product> products){
+        for (Product product : products) {
+            setSaleAndReviewNumber(product);
+        }
+    }
+
+    public List<Product> search(String keyword,int start,int size){
+        Sort sort = new Sort(Sort.Direction.DESC,"id");
+        Pageable pageable = new PageRequest(start,size,sort);
+        List<Product> products = productDAO.findByNameLike("%"+keyword+"%",pageable);
+        return products;
+    }
+
 }

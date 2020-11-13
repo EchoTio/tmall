@@ -1,5 +1,6 @@
 package com.how2java.tmall.web;
 
+import com.how2java.tmall.pojo.Order;
 import com.how2java.tmall.pojo.Product;
 import com.how2java.tmall.service.CategoryService;
 import com.how2java.tmall.service.ProductImageService;
@@ -50,4 +51,6 @@ public class ProductController {
         productService.update(bean);
         return bean;
     }
+
+
 }
