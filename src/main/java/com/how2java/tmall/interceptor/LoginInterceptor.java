@@ -1,15 +1,17 @@
 package com.how2java.tmall.interceptor;
 
-import com.how2java.tmall.pojo.User;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-public class LoginInterceptor implements HandlerInterceptor{
+import com.how2java.tmall.pojo.User;
+import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+
+public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
         HttpSession session = httpServletRequest.getSession();
@@ -39,16 +41,15 @@ public class LoginInterceptor implements HandlerInterceptor{
                 "foredoreview"
 
         };
-        //获取uri
+
         String uri = httpServletRequest.getRequestURI();
-        //去掉前缀/tmall_springboot
-        uri = StringUtils.remove(uri,contextPath+"/");
+
+        uri = StringUtils.remove(uri, contextPath+"/");
         String page = uri;
-        //判断是否是以requireAuthPath开头的,
-        if(begingWith(page,requireAuthPages)){
-            //session获取用户，如果不存在返回登陆
-            User user =(User)session.getAttribute("user");
-            if (user==null){
+
+        if(begingWith(page, requireAuthPages)){
+            User user = (User) session.getAttribute("user");
+            if(user==null) {
                 httpServletResponse.sendRedirect("login");
                 return false;
             }
@@ -56,10 +57,10 @@ public class LoginInterceptor implements HandlerInterceptor{
         return true;
     }
 
-    private boolean begingWith(String page,String[] requireAuthPages){
+    private boolean begingWith(String page, String[] requiredAuthPages) {
         boolean result = false;
-        for (String requireAuthPage : requireAuthPages) {
-            if(StringUtils.startsWith(page,requireAuthPage)){
+        for (String requiredAuthPage : requiredAuthPages) {
+            if(StringUtils.startsWith(page, requiredAuthPage)) {
                 result = true;
                 break;
             }
@@ -68,14 +69,11 @@ public class LoginInterceptor implements HandlerInterceptor{
     }
 
     @Override
-    public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o,
-                           ModelAndView modelAndView)throws Exception{
+    public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) throws Exception {
 
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest httpServletRequest,HttpServletResponse httpServletResponse,Object o,
-                                Exception e)throws Exception{
-
+    public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
     }
 }

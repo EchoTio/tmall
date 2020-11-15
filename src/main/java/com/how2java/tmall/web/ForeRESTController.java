@@ -5,11 +5,18 @@ import com.how2java.tmall.pojo.*;
 import com.how2java.tmall.service.*;
 import com.how2java.tmall.util.Result;
 import org.apache.commons.lang.math.RandomUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
+import org.apache.shiro.crypto.hash.SimpleHash;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.HtmlUtils;
 
 import javax.servlet.http.HttpSession;
+import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -47,40 +54,42 @@ public class ForeRESTController {
 
     @PostMapping("/foreregister")
     public Object register(@RequestBody User user) {
-        //通过参数User获取浏览器提交的账号密码
-        String name = user.getName();
+        String name =  user.getName();
         String password = user.getPassword();
-        //对账号里的特殊符号进行转义
         name = HtmlUtils.htmlEscape(name);
         user.setName(name);
-        //判断用户是否存在
         boolean exist = userService.isExist(name);
-        //如果存在，就返回Result.fail并带上错误信息
-        if (exist) {
-            String message = "用户名已经被使用，不能使用";
+
+        if(exist){
+            String message ="用户名已经被使用,不能使用";
             return Result.fail(message);
         }
-        //如果不存在，就加入到数据库，并返回Result.success()
+
         user.setPassword(password);
+
         userService.add(user);
+
         return Result.success();
     }
 
 
+
     @PostMapping("/forelogin")
     public Object login(@RequestBody User userParam, HttpSession session) {
-        String name = userParam.getName();
+        String name =  userParam.getName();
         name = HtmlUtils.htmlEscape(name);
 
-        User user = userService.get(name, userParam.getPassword());
-        if (null == user) {
-            String message = "账号密码错误";
+        User user =userService.get(name,userParam.getPassword());
+        if(null==user){
+            String message ="账号密码错误";
             return Result.fail(message);
-        } else {
+        }
+        else{
             session.setAttribute("user", user);
             return Result.success();
         }
     }
+
 
     @GetMapping("/foreproduct/{pid}")
     public Object product(@PathVariable("pid") int pid) {
@@ -104,13 +113,15 @@ public class ForeRESTController {
         return Result.success(map);
     }
 
+
     @GetMapping("forecheckLogin")
-    public Object checkLogin(HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        if (null != user)
+    public Object checkLogin( HttpSession session) {
+        User user =(User)  session.getAttribute("user");
+        if(null!=user)
             return Result.success();
         return Result.fail("未登录");
     }
+
 
     @GetMapping("forecategory/{cid}")
     public Object category(@PathVariable int cid, String sort) {
@@ -303,7 +314,7 @@ public class ForeRESTController {
         User user = (User) session.getAttribute("user");
         if(null==user)
             return Result.fail("未登录");
-        List<Order> os = orderService.listByUserWithoutDetele(user);
+        List<Order> os = orderService.listByUserWithoutDelete(user);
         orderService.removeOrderFromOrderItem(os);
         return os;
     }
